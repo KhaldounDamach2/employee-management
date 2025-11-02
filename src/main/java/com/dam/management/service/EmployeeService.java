@@ -1,0 +1,29 @@
+package com.dam.management.service;
+
+import com.dam.management.model.Employee;
+import com.dam.management.repository.EmployeeRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class EmployeeService {
+    
+    private final EmployeeRepository employeeRepository;
+    
+    public EmployeeService(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
+    
+    public Employee addEmployee(String name) {
+        Long id = employeeRepository.addEmployee(name);
+        Employee employee = new Employee();
+        employee.setId(id);
+        employee.setName(name);
+        return employee;
+    }
+    
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.getAllEmployees();
+    }
+}
