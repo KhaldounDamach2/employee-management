@@ -26,7 +26,7 @@ public class EmployeeRepository {
             System.out.println("=== REPOSITORY: Adding employee: " + name + " ===");
             
             return jdbcTemplate.execute((ConnectionCallback<Long>) conn -> {
-                try (CallableStatement stmt = conn.prepareCall("{call EMPLOYEE_PKG.ADD_EMPLOYEE(?, ?)}")) {
+                try (CallableStatement stmt = conn.prepareCall("{call EMPLOYEE_MANAGEMENT_PKG.CREATE_EMPLOYEE(?, ?)}")) {
                     stmt.setString(1, name);
                     stmt.registerOutParameter(2, Types.NUMERIC);
                     stmt.execute();
