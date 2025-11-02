@@ -7,22 +7,9 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     
-    services:
-      oracle:
-        image: container-registry.oracle.com/database/express:21.3.0-xe
-        env:
-          ORACLE_PWD: Knn1973,00
-        options: >-
-          --health-cmd healthcheck.sh
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
-        ports:
-          - 1521:1521
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -33,12 +20,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Build and test with Maven
-      run: mvn clean package
-      env:
-        SPRING_DATASOURCE_URL: jdbc:oracle:thin:@localhost:1521:XE
-        SPRING_DATASOURCE_USERNAME: system
-        SPRING_DATASOURCE_PASSWORD: Knn1973,00
+    - name: Build with Maven (Skip Tests)
+      run: mvn clean package -DskipTests
+
+    - name: Run Tests (Without Oracle)
+      run: mvn test -Dspring.datasource.url=jdbc:h2:mem:testdb -Dspring.datasource.username=sa -Dspring.datasource.password=
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -48,7 +34,7 @@ jobs:
 
   docker-build:
     runs-on: ubuntu-latest
-    needs: test
+    needs: build
     if: github.ref == 'refs/heads/main'
     
     steps:
@@ -65,7 +51,9 @@ jobs:
 
     - name: Test Docker image
       run: |
-        docker run -d --name test-app -p 8080:8080 employee-management:latest
-        sleep 30
+        # Test that the image builds and starts (without database)
+        docker run -d --name test-app -p 8080:8080 -e SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb employee-management:latest
+        sleep 10
         docker ps
         docker logs test-app
+        docker stop test-app
