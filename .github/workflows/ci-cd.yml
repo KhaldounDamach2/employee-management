@@ -48,9 +48,9 @@ jobs:
 
     - name: Test Docker image
       run: |
-        # Test that the image builds and starts
-        docker run -d --name test-app -p 8080:8080 employee-management:latest
-        sleep 10
+        # Test that the image builds and starts (without database connection)
+        docker run -d --name test-app -p 8080:8080 -e SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb employee-management:latest
+        sleep 15
         docker ps
-        docker logs test-app
+        docker logs test-app | head -20
         docker stop test-app
