@@ -26,4 +26,6 @@ replay_pid*
 
 # Environment files
 .env
-!/.env.example
+!/.env.example 
+# Maven target directory 
+target/ 
