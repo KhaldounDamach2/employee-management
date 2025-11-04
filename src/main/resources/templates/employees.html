@@ -41,6 +41,7 @@
                             <th>ID</th>
                             <th>Name</th>
                             <th>Created Date</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -48,6 +49,10 @@
                             <td th:text="${employee.id}"></td>
                             <td th:text="${employee.name}"></td>
                             <td th:text="${employee.createdDate}"></td>
+                            <td>
+                                <a th:href="@{/employees/edit/{id}(id=${employee.id})}" 
+                                   class="btn btn-warning btn-sm">Edit</a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

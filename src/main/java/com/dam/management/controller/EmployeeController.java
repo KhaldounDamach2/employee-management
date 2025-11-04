@@ -27,6 +27,21 @@ public class EmployeeController {
         return "employees";
     }
     
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable Long id, Model model) {
+        System.out.println("=== CONTROLLER: showEditForm called with id: " + id + " ===");
+        Employee employee = employeeService.getEmployeeById(id);
+        model.addAttribute("employee", employee);
+        return "edit-employee"; // Separate edit page
+    }
+    
+    @PostMapping("/update/{id}")
+    public String updateEmployee(@PathVariable Long id, @RequestParam String name) {
+        System.out.println("=== CONTROLLER: updateEmployee called with id: " + id + ", name: " + name + " ===");
+        employeeService.updateEmployee(id, name);
+        return "redirect:/employees";
+    }
+    
     @PostMapping("/add")
     public String addEmployee(@RequestParam String name, Model model) {
         System.out.println("=== CONTROLLER: addEmployee called with name: " + name + " ===");

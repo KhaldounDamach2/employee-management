@@ -26,4 +26,13 @@ public class EmployeeService {
     public List<Employee> getAllEmployees() {
         return employeeRepository.getAllEmployees();
     }
+    
+    public Employee getEmployeeById(Long id) {
+        return employeeRepository.getEmployeeById(id);
+    }
+    
+    public void updateEmployee(Long id, String name) {
+        employeeRepository.updateEmployee(id, name);
+        System.out.println("=== SERVICE: Updated employee ID " + id + " to name: " + name + " ===");
+    }
 }

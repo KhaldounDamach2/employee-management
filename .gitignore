@@ -29,3 +29,18 @@ replay_pid*
 !/.env.example 
 # Maven target directory 
 target/ 
+
+
+# STS/Eclipse IDE files
+.classpath
+.project
+.settings/
+bin/
+
+# Local configuration with passwords (CRITICAL)
+application-local.properties
+*.local.properties
+
+# System files
+.DS_Store
+Thumbs.db
