@@ -9,7 +9,6 @@ services:
       - "${DB_PORT}:1521"
     volumes:
       - oracle-data:/opt/oracle/oradata
-      - ./sql-scripts:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD", "bash", "-c", "echo \"SELECT 'READY' FROM dual;\" | sqlplus -s system/$$ORACLE_PWD@XE"]
       interval: 30s
