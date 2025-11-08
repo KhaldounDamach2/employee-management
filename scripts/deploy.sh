@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+# Self-fix: Ensure script is executable when downloaded
+if [ ! -x "$0" ]; then
+    echo "🔧 Making deployment script executable..."
+    chmod +x "$0"
+    echo "🔁 Restarting script with proper permissions..."
+    exec "$0" "$@"
+fi
+
 echo "🚀 Employee Management App - Professional Deployment"
 echo "===================================================="
 
@@ -14,13 +22,26 @@ else
     mkdir -p $DEPLOY_DIR
     cd $DEPLOY_DIR
     
-    # Download necessary files
-    echo "📥 Downloading deployment files..."
-    curl -sL -O https://raw.githubusercontent.com/KhaldounDamach2/employee-management/main/docker-compose.yml
-    curl -sL -O https://raw.githubusercontent.com/KhaldounDamach2/employee-management/main/Dockerfile
-    curl -sL -O https://raw.githubusercontent.com/KhaldounDamach2/employee-management/main/.env.example
-    echo "✅ Required files downloaded"
+    # Download the entire repository as ZIP
+    echo "📥 Downloading complete application source code..."
+    curl -sL -o repo.zip https://github.com/KhaldounDamach2/employee-management/archive/main.zip
+    
+    echo "📦 Extracting application files..."
+    # Install unzip if not available
+    if ! command -v unzip &> /dev/null; then
+        echo "📦 Installing unzip..."
+        sudo apt update && sudo apt install unzip -y
+    fi
+    
+    # Extract the ZIP file
+    unzip -q repo.zip
+    mv employee-management-main/* .
+    mv employee-management-main/.* . 2>/dev/null || true
+    rm -rf employee-management-main repo.zip
+    
+    echo "✅ Complete application source code downloaded and extracted"
 fi
+
 
 # Interactive password setup
 if [ ! -f .env ]; then
