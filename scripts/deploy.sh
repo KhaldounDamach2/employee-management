@@ -16,15 +16,17 @@ echo "===================================================="
 if [ -d ".git" ]; then
     echo "📁 Development mode: Git repository detected"
     DEPLOY_DIR="."
+    # Pull latest changes if in git mode
+    git pull origin main
 else 
     echo "📁 Production mode: Standalone deployment"
     DEPLOY_DIR="./employee-management-deploy"
     mkdir -p $DEPLOY_DIR
     cd $DEPLOY_DIR
     
-    # Download the entire repository as ZIP
-    echo "📥 Downloading complete application source code..."
-    curl -sL -o repo.zip https://github.com/KhaldounDamach2/employee-management/archive/main.zip
+    # Download the entire repository as ZIP with cache busting
+    echo "📥 Downloading FRESH application source code..."
+    curl -sL -o repo.zip "https://github.com/KhaldounDamach2/employee-management/archive/main.zip?t=$(date +%s)"
     
     echo "📦 Extracting application files..."
     # Install unzip if not available
@@ -33,13 +35,17 @@ else
         sudo apt update && sudo apt install unzip -y
     fi
     
+    # Clean existing files and extract fresh
+    echo "🧹 Cleaning existing files..."
+    find . -maxdepth 1 ! -name '.env' ! -name '.' ! -name '..' -exec rm -rf {} + 2>/dev/null || true
+    
     # Extract the ZIP file
-    unzip -q repo.zip
+    unzip -q -o repo.zip
     mv employee-management-main/* .
     mv employee-management-main/.* . 2>/dev/null || true
     rm -rf employee-management-main repo.zip
     
-    echo "✅ Complete application source code downloaded and extracted"
+    echo "✅ Fresh application source code downloaded and extracted"
 fi
 
 
@@ -109,10 +115,14 @@ docker login container-registry.oracle.com || {
     echo "⚠️  Oracle login skipped or failed - ensure you have access to container-registry.oracle.com"
 }
 
+# Stop any running services first
+echo "🐳 Stopping any running services..."
+docker-compose down 2>/dev/null || true
+
 # Start services
 echo "🐳 Starting services..."
 echo "⏳ This may take a few minutes (Oracle database initialization)..."
-docker-compose up -d
+docker-compose up -d --build
 
 echo ""
 echo "✅ Deployment completed successfully!"
