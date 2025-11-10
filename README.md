@@ -45,3 +45,4 @@ Dieses Projekt verwendet **GitHub Actions** für Continuous Integration:
 - Geschäftslogik in Oracle PL/SQL-Paketen
 - Spring Boot orchestriert Datenbankaufrufe
 - Vollständig containerisiert mit Docker"Test auto-deployment" 
+"Test SSH key fix" 
