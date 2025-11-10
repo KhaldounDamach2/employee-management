@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -32,6 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main'
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -46,10 +48,37 @@ jobs:
 
     - name: Test Docker image
       run: |
+        # Test that the image builds and starts (without database connection)
         docker run -d --name test-app -p 8080:8080 -e SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb employee-management:latest
         sleep 15
         docker ps
         docker logs test-app | head -20
         docker stop test-app
 
-  # REMOVED: deploy job (until we fix SSH)
+  # UPDATED DEPLOYMENT JOB USING deploy.sh:
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build, docker-build]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Deploy to Production Server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          echo "🚀 Starting automated deployment..."
+          cd $HOME/employee-management-deploy
+          
+          # Download latest deploy.sh from repo
+          curl -sL -O https://raw.githubusercontent.com/KhaldounDamach2/employee-management/main/scripts/deploy.sh
+          chmod +x deploy.sh
+          
+          # Pull latest code and run professional deployment
+          git pull origin main
+          ./deploy.sh
+          
+          echo "✅ Professional deployment completed!"
+          echo "🌐 Your app is now live at: http://${{ secrets.SERVER_HOST }}:8081"
