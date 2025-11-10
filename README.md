@@ -44,4 +44,4 @@ Dieses Projekt verwendet **GitHub Actions** für Continuous Integration:
 ### Architektur
 - Geschäftslogik in Oracle PL/SQL-Paketen
 - Spring Boot orchestriert Datenbankaufrufe
-- Vollständig containerisiert mit Docker
+- Vollständig containerisiert mit Docker"Test auto-deployment" 
