@@ -124,6 +124,40 @@ echo "🐳 Starting services..."
 echo "⏳ This may take a few minutes (Oracle database initialization)..."
 docker-compose up -d --build
 
+# Wait for Oracle to be fully ready
+echo "⏳ Waiting for Oracle database to be fully ready (this can take 3-5 minutes)..."
+echo "📊 Monitoring startup progress..."
+
+# Wait for Oracle health check to pass
+for i in {1..30}; do
+    if docker ps --filter "name=employee-oracle-db" --format "{{.Status}}" | grep -q "(healthy)"; then
+        echo "✅ Oracle database is healthy and ready!"
+        break
+    fi
+    echo "⏱️  Waiting for Oracle... ($i/30) - $(docker logs employee-oracle-db --tail 5 2>/dev/null | grep -i 'ready' || echo 'Starting up...')"
+    sleep 10
+done
+
+# Wait for db-init to complete
+echo "🔄 Waiting for database initialization to complete..."
+for i in {1..20}; do
+    if docker ps --filter "name=employee-db-init" --format "{{.Status}}" | grep -q "Exited (0)"; then
+        echo "✅ Database initialization completed successfully!"
+        break
+    fi
+    echo "⏱️  Waiting for DB initialization... ($i/20)"
+    sleep 10
+done
+
+# Final check if app is running
+echo "🔍 Checking if application is ready..."
+sleep 10
+if docker ps --filter "name=employee-management-app" --format "{{.Status}}" | grep -q "Up"; then
+    echo "🎉 Application is running and ready!"
+else
+    echo "⚠️  Application is starting up... Check logs with: docker-compose logs -f app"
+fi
+
 echo ""
 echo "✅ Deployment completed successfully!"
 echo "======================================"
