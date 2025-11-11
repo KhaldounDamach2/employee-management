@@ -109,11 +109,9 @@ EOF
     echo ""
 fi
 
-# Login to Oracle Container Registry
-echo "🔐 Checking Oracle container registry access..."
-docker login container-registry.oracle.com || {
-    echo "⚠️  Oracle login skipped or failed - ensure you have access to container-registry.oracle.com"
-}
+# FIXED: Skip Oracle container registry login for auto-deploy
+echo "🔐 Oracle container registry access - auto-deploy mode"
+echo "ℹ️  Oracle login skipped for automated deployment"
 
 # Stop any running services first
 echo "🐳 Stopping any running services..."
